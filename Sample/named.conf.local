@@ -1,0 +1,49 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+
+# MANGIN
+zone "mangin.tk" {
+        type master;
+        file "/etc/bind/db.mangin.tk";
+};
+
+# NOUBZ
+zone "noubz.tk" {
+        type master;
+        file "/etc/bind/db.noubz.tk";
+};
+
+# NS1
+zone "62.in-addr.arpa" {
+        type master;
+	notify no;
+        file "/etc/bind/db.62";
+};
+
+# NS2
+zone "195.in-addr.arpa" {
+        type master;
+	notify no;
+        file "/etc/bind/db.195";
+};
+
+# ancien NS2
+#zone "212.in-addr.arpa" {
+#        type master;
+#	notify no;
+#        file "/etc/bind/db.212";
+#};
+
+/* PIDIBOU
+zone "pidibou.tk" {
+        type slave;
+//        file "/var/cache/bind/db.pidibou.tk";
+	masters { 212.47.234.194; };
+};*/
+
