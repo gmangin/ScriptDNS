@@ -1,16 +1,16 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                                              #
-#    g1dns.py                                                                  #
+#    main.py                                                                   #
 #                                                                              #
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
-#    Created: 2015/06/02 18:44:39 by gmangin                                   #
-#    Updated: 2015/06/09 17:32:35 by gmangin                                   #
+#    Created: 2015/06/09 17:33:49 by gmangin                                   #
+#    Updated: 2015/06/09 19:05:07 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/python3.4 -w
+#!/usr/bin/python3 -w
 
 import sys
 import re
@@ -35,34 +35,57 @@ class ServerDns:
         self._subdomain = {}
         self._is_master = True
 
-    def set_ip(self, ip):
+    @property
+    def ip(self):
+        return self._ip
+    @ip.setter
+    def ip(self, ip):
         self._ip = ip
 
-    def set_domain_name(self, name):
+    @property
+    def domain_name(self):
+        return self._domain_name
+    @domain_name.setter
+    def domain_name(self, name):
         self._domain_name = name
 
-    def set_master(self, master):
+    @property
+    def master(self):
+        return self._master
+    @master.setter
+    def master(self, master):
         self._master = master
 
-    def set_slaves(self, slave):
+    @property
+    def slaves(self):
+        return self._slaves
+    @slaves.setter
+    def slaves(self, slave):
         self._slaves.append(slave)
 
-    def set_suddomain(self, sub_name, sub_ip):
-        self._subdomain[sub_name] = sub_ip
+    @property
+    def suddomain(self):
+        return self._subdomain
+    @suddomain.setter
+    def suddomain(self, sub_name):
+        for key in sub_name:
+            self._subdomain[key] = sub_name[key]
 
-    def set_ismaster(self, is_master):
+    @property
+    def ismaster(self):
+        return self._is_master
+    @ismaster.setter
+    def ismaster(self, is_master):
         if is_master:
-            self.set_master(self._ip)
+            self.master = self._ip
         else:
             self._is_master = False
 
-    def show_attribut(self):
+    def __repr__(self):
         '''Print all the odject s attribut'''
-
         print('-Ip          : {}'.format(self._ip))
         print('-Domain_name : {}'.format(self._domain_name))
         print('-Master      : {}'.format(self._master))
-        print('-Is_master   : {}'.format(self._is_master))
         if self._slaves:
             print('-Slaves      : ')
             for slave in self._slaves:
@@ -71,6 +94,7 @@ class ServerDns:
             print('-Subdomain   : ')
             for sub_name, sub_ip in self._subdomain.items():
                 print('  * {0:8} = {1:}'.format(sub_name, sub_ip))
+        return '-Is_master   : {}'.format(self._is_master)
 
     def write_local(self):
         '''fullfill FILE_LOCAL with domain_name, master and slaves info'''
@@ -108,7 +132,7 @@ def ip_check(line, error):
 def func_ip_server(dns, conf, line):
     '''get the server ip from the conf file
        CALL FROM conf_parser'''
-    dns.set_ip(ip_check(line, 'MISSING IP_SERVER - {!r}'.format(line)))
+    dns.ip = ip_check(line, 'MISSING IP_SERVER - {!r}'.format(line))
 
 
 def func_dns(dns, conf, line):
@@ -117,7 +141,7 @@ def func_dns(dns, conf, line):
     try:
         isdns = re.findall(': (.+)', line)
         if isdns:
-            dns.set_domain_name(isdns[0])
+            dns.domain_name = isdns[0]
         else:
             error = 'MISSING DNS - domain s name {!r} '.format(line)
             raise NameError(error)
@@ -130,17 +154,17 @@ def func_master(dns, conf, line):
     '''get the master ip from the conf file
        CALL FROM conf_parser'''
     if re.search('YES', line):
-        dns.set_ismaster(True)
+        dns.ismaster = True
     else:
-        dns.set_ismaster(False)
-        dns.set_master(ip_check(line, 'MISSING YES or IP MASTER'))
+        dns.ismaster = False
+        dns.master = ip_check(line, 'MISSING YES or IP MASTER')
 
 
 def func_slave(dns, conf, line):
     '''get the slave ip from the conf file if there is/are slave(s)
        CALL FROM conf_parser'''
     if not re.search('YES', line) and not re.search('NO', line):
-        dns.set_slaves(ip_check(line, 'MISSING YES NO or IP SLAVE'))
+        dns.slaves = ip_check(line, 'MISSING YES NO or IP SLAVE')
 
 
 def func_sub_name(dns, conf, line):
@@ -155,7 +179,7 @@ def func_sub_name(dns, conf, line):
         sub_ip = conf.readline()
         if 'SUB_IP' in sub_ip:
             ip = ip_check(sub_ip, 'MISSING subdomain\'s ip')
-            dns.set_suddomain(sub_name[0], ip)
+            dns.suddomain = {sub_name[0]: ip}
         else:
             error = 'MISSING SUB_IP - subdomain\'s ip {!r}'.format(line)
             raise NameError(error)
@@ -179,7 +203,7 @@ def conf_parser(dns):
             for name in funcdict:
                 if name in line:
                     funcdict[name](dns, conf, line)
-        dns.show_attribut()
+        print(dns)
 
 
 def launch_dns_script():
@@ -205,15 +229,15 @@ Usage: {} [OPTIONS]
 
 
 def main():
-    try:
+#    try:
         if len(sys.argv) == 1:
             launch_dns_script()
         elif len(sys.argv) == 5 and sys.argv[1] == '-add':
             launch_subdomain_script(sys.argv[2], sys.argv[3], sys.argv[4])
         else:
             print_usage()
-    except:
-        print('oups...')
+#    except:
+#        print('oups...')
 
 
 if __name__ == '__main__':
