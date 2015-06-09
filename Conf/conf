@@ -1,5 +1,5 @@
 # add the server ip where you want to put the dns files
-IP_SERVEUR : 62.210.75.32
+IP_SERVER : 62.210.75.32
 
 # this is your domain s name
 DNS        : mangin.tk
