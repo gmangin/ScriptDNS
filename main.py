@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/02 18:44:39 by gmangin                                   #
-#    Updated: 2015/06/09 15:36:32 by gmangin                                   #
+#    Updated: 2015/06/09 15:58:44 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,47 +27,48 @@ CONF='./Conf/conf'
 
 class ServerDns:
     def __init__(self):
-        self.__ip=''
-        self.__domain_name=''
-        self.__master=''
-        self.__slaves=[]
-        self.__subdomain={}
-        self.__is_master=True
+        self._ip=''
+        self._domain_name=''
+        self._master=''
+        self._slaves=[]
+        self._subdomain={}
+        self._is_master=True
         
     def set_ip(self, ip):
-        self.__ip = ip
+        self._ip = ip
 
     def set_domain_name(self, name):
-        self.__domain_name = name
+        self._domain_name = name
 
     def set_master(self, master):
-        self.__master = master
+        self._master = master
 
     def set_slaves(self, slave):
-        self.__slaves.append(slave)
+        self._slaves.append(slave)
 
     def set_suddomain(self, sub_name, sub_ip):
-        self.__subdomain[sub_name] = sub_ip
+        self._subdomain[sub_name] = sub_ip
 
     def set_ismaster(self, is_master):
         if is_master == True:
-            self.set_master(self.__ip)
+            self.set_master(self._ip)
         else:
-            self.__is_master=False
+            self._is_master=False
 
     def show_attribut(self):
         '''Print all the odject s attribut'''
-        print('-Ip          : {}'.format(self.__ip))
-        print('-Domain_name : {}'.format(self.__domain_name))
-        print('-Master      : {}'.format(self.__master))
-        print('-Is_master   : {}'.format(self.__is_master))
-        if self.__slaves:
+        print('-Ip          : {}'.format(self._ip))
+        print('-Domain_name : {}'.format(self._domain_name))
+        print('-Master      : {}'.format(self._master))
+        print('-Is_master   : {}'.format(self._is_master))
+        if self._slaves:
             print('-Slaves      : ')
-            for slave in self.__slaves:
+            for slave in self._slaves:
                 print('  * {}'.format(slave))
-        print('-Subdomain   : ')
-        for sub_name, sub_ip in self.__subdomain.items():
-            print('  * {0:8} = {1:}'.format(sub_name, sub_ip))
+        if self._subdomain:
+            print('-Subdomain   : ')
+            for sub_name, sub_ip in self._subdomain.items():
+                print('  * {0:8} = {1:}'.format(sub_name, sub_ip))
 
     def write_local(self):
         '''fullfill FILE_LOCAL with domain_name, master and slaves info'''
