@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/10 13:34:53 by gmangin                                   #
+#    Updated: 2015/06/10 13:46:00 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,6 @@
 import sys
 import re
 import os
-import logging
 import ipaddress
 
 DIR_READ = 'Sample'
