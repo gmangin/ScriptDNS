@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 from pathlib import PurePath
 import os
@@ -30,15 +31,19 @@ class ServerDns(object):
         return ''
 
 if __name__ == '__main__':
-    dns = ServerDns()
-    dns.ip = 'caca'
-    print(dns.ip)
-    print(dns)
+#    dns = ServerDns()
+#    dns.ip = 'caca'
+#    print(dns.ip)
+#    print(dns)
 
-#    print([x for x in p.iterdir() if x.is_dir()])
-    p = PurePath(Path.cwd(), DIR_READ, FILE_OPTIONS)
-    print(p)
-#    print(list(p.glob('**/' FILE_OPTIONS)))
-#    q = p / 'Sample' / FILE_OPTIONS
-#    print(q)
-#    print(q.resolve())
+    parser = argparse.ArgumentParser(description='Read the README.md before.')
+    metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
+    help_parse = 'Add a subdomain on one domain of your dns server.'
+    parser.add_argument('-add',
+                        nargs=3,
+                        metavar=metavar_parse,
+                        dest='add',
+                        help=help_parse)
+    args = parser.parse_args()
+    print(args)
+    print(args.add)

@@ -6,24 +6,25 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/10 13:46:00 by gmangin                                   #
+#    Updated: 2015/06/10 16:23:18 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
 #!/usr/bin/python3 -w
 
-import sys
 import re
 import os
+import sys
+import argparse
 import ipaddress
 
 DIR_READ = 'Sample'
 DIR_WRITE = 'ReadyToCopyPaste'
 
-FILE_CONF = 'conf'
 FILE_OPTIONS = "named.conf.options"
 FILE_LOCAL = "named.conf.local"
 FILE_DB = "db.sample"
+FILE_CONF = 'conf'
 
 
 class ServerDns(object):
@@ -190,7 +191,7 @@ def parse_sub_name(dns, conf, line):
 def get_conf(dns):
     '''read and Parse the conf file in order to get all the dns attribut
        CALL FROM launch_dns_script()'''
-    print('Getting the conf ...')
+    print('=== Getting the conf ===')
     path_conf = os.path.join(os.getcwd(), FILE_CONF)
     with open(path_conf, 'r') as conf:
         funcdict = {
@@ -218,31 +219,37 @@ def launch_dns_script():
 #    dns.write_db()
 
 
-def print_usage():
-    print("""\
-Usage: {} [OPTIONS]
-      -add [domain name] [subdomain name] [subdomain ip]
-           Add a subdomain without changing anything
-           on one domain of your dns server.
-
-      READ THE README
-    """.format(sys.argv[0]))
+def init_args_parser():
+    '''parse the sys.args with argparse and return the result
+    CALL FROM main()'''
+    parser = argparse.ArgumentParser(description='Read the README.md before.')
+    metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
+    help_parse = 'Add a subdomain on one domain of your dns server.'
+    parser.add_argument('-add',
+                        nargs=3,
+                        metavar=metavar_parse,
+                        help=help_parse)
+    args = parser.parse_args()
+    return args
 
 
 def main():
+    '''launch the subdomain script it option -add,
+       launch the dns script if no option
+       and handle any error that happen during the program'''
     try:
-        if len(sys.argv) == 1:
-            launch_dns_script()
-        elif len(sys.argv) == 5 and sys.argv[1] == '-add':
-            launch_subdomain_script(sys.argv[2], sys.argv[3], sys.argv[4])
+        args = init_args_parser()
+        if args.add:
+            launch_subdomain_script(args.add[0], args.add[1], args.add[2])
         else:
-            print_usage()
+            launch_dns_script()
     except OSError as err:
             print("OS error: {0}".format(err))
     except NameError as err:
         print(err)
     except:
-        print('Goodbye, world! ', sys.exc_info()[0])
+        print('Goodbye, world! ')
+        #, sys.exc_info()[0])
 
 
 if __name__ == '__main__':
