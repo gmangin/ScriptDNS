@@ -9,7 +9,7 @@ DIR_WRITE = Path('ReadyToCopyPaste')
 FILE_OPTIONS = 'conf'
 FILE_LOCAL = "named.conf.local"
 FILE_DB = "db.sample"
-
+FILE_CONF = 'conf'
 
 class ServerDns(object):
     def __init__(self):
@@ -30,20 +30,23 @@ class ServerDns(object):
         print('prout')
         return ''
 
-if __name__ == '__main__':
-#    dns = ServerDns()
-#    dns.ip = 'caca'
-#    print(dns.ip)
-#    print(dns)
+def parse_arg(parser, obj):
+    parser.add_argument(obj,
+                        nargs=2,
+                        metavar=(':', 'VALUE'))
 
-    parser = argparse.ArgumentParser(description='Read the README.md before.')
-    metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
-    help_parse = 'Add a subdomain on one domain of your dns server.'
-    parser.add_argument('-add',
-                        nargs=3,
-                        metavar=metavar_parse,
-                        dest='add',
-                        help=help_parse)
-    args = parser.parse_args()
-    print(args)
-    print(args.add)
+if __name__ == '__main__':
+    path_conf = os.path.join(os.getcwd(), FILE_CONF)
+    with open(path_conf, 'r') as conf:
+        parser = argparse.ArgumentParser(description='Read the README.md before.')
+        parse_arg(parser, 'IP_SERVER')
+        parse_arg(parser, 'DNS')
+        parse_arg(parser, 'MASTER')
+        parse_arg(parser, 'SLAVE')
+        parse_arg(parser, 'SUB_NAME')
+        parse_arg(parser, 'SUB_IP')
+    parser.add_argument('#',
+                        nargs=+,
+        args = parser.parse_args(conf)
+        print(args)
+        print(args.add)

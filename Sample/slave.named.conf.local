@@ -1,0 +1,7 @@
+# __DOMAIN_NAME__
+zone "__DOMAIN_NAME__." {
+ 	    type slave;
+	    notify yes;
+	    masters { __MASTER__; };
+};
+

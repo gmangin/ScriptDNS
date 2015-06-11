@@ -1,0 +1,6 @@
+# __DOMAIN_NAME__
+zone "__DOMAIN_NAME__" {
+        type master;
+        file "/etc/bind/db.__DOMAIN_NAME__";
+};
+

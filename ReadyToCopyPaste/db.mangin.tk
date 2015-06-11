@@ -1,0 +1,18 @@
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+__SUB_NAME_	IN	A	_SUB_IP_

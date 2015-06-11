@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/10 16:23:18 by gmangin                                   #
+#    Updated: 2015/06/11 18:29:19 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -103,26 +103,106 @@ class ServerDns(object):
                 print('  * {0:8} = {1:}'.format(sub_name, sub_ip))
         return '-Is_master   : {}'.format(self._is_master)
 
-    def write_local(self):
-        '''fullfill FILE_LOCAL with domain_name, master and slaves info'''
-        pass
+    def replace_ip(self, line, destination):
+        destination.write(line.replace('__IP_SERVER__', self.ip))
 
-    def write_option(self):
+    def replace_domain_name(self, line, destination):
+        if 'IN' and 'ns?.' in line:
+            for index, value in enumerate(self.slaves):
+                destination.write(line.replace('?.__DOMAIN_NAME__', str(index + 2) + '.' + self.domain_name))
+        else:
+            destination.write(line.replace('__DOMAIN_NAME__', self.domain_name))
+
+    def replace_master(self, line, destination):
+        destination.write(line.replace('__MASTER__', self.master))
+
+    def replace_slaves(self, line, destination):
+        for index, value in enumerate(self.slaves):
+            if 'IN' and 'ns?' in line:
+                test = line.replace('?', str(index + 2))
+                destination.write(test.replace('__SLAVE__', value))
+            else:
+                destination.write(line.replace('__SLAVE__', value))
+
+    def replace_suddomain(self, line, destination):
+        destination.write(self._subdomain)
+
+    def replace_ismaster(self, line, destination):
+        if self.ismaster:
+            destination.write(line.replace('__ISMASTER__', self.master))
+
+    def replace_value(self, line, destination):
+        funcdict = {
+            '__IP_SERVER__': self.replace_ip,
+            '__DOMAIN_NAME__' : self.replace_domain_name,
+            '__MASTER__' : self.replace_master,
+            '__SLAVE__' : self.replace_slaves,
+            '__SUB_NAME__' : self.replace_suddomain,
+            '__ISMASTER__' : self.replace_ismaster
+        }
+        find = 0
+        for name in funcdict:
+            if name in line:
+                print(name)
+                funcdict[name](line, destination)
+                find = 1
+        if not find:
+            destination.write(line)
+                    
+    def get_file_local(self, destination):
+        '''Open the correct FILE_LOCAL (master or slave)
+           and call replace() to fullfill FILE_LOCAL info'''
+        if self.ismaster:
+            file_local = 'master.{}'.format(FILE_LOCAL)
+        else:
+            file_local = 'slave.{}'.format(FILE_LOCAL)
+        path_read_local = os.path.join(os.getcwd(), DIR_READ, file_local)
+        with open(path_read_local, 'r') as source:
+            for line in source:
+                self.replace_value(line, destination)
+
+    def get_file_option(self):
         '''fullfill FILE_OPTIONS with master and slaves info'''
-        pass
+        path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
 
-    def write_db(self):
+    def get_file_db(self, line):
         '''fullfill FILE_DB with domain_name, master,
            slaves and subdomain info'''
-        pass
+        if self.ismaster:
+            write_file_db = FILE_DB.replace('sample', self.domain_name)
+            path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
+            with open(path_write_db, 'a') as destination:
+                self.replace_value(line, destination)
 
 
-def launch_subdomain_script(domain, sub_name, sud_ip):
-    '''Just add a subdomain to a domain if the file db is
-       in the repository ReadyToCopyPaste
-       CALL FROM main()'''
-    pass
-#    dns = ServerDNS()
+def file_local(all_dns, isdomain):
+    '''Prepare the local file, send it to dns.get_file_local to be written
+       Call from'''
+    print('=== Getting the local file ===')
+    path_write_local = os.path.join(os.getcwd(), DIR_WRITE, FILE_LOCAL)
+    with open(path_write_local, 'a') as destination:
+        for dns in all_dns:
+            dns.get_file_local(destination)
+
+
+def file_option(all_dns, isdomain):
+    print('=== Getting the options file ===')
+    path_write_options = all_dns, os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
+    with open(path_write_options, 'a') as destination:
+        for dns in all_dns:
+            dns.get_file_options(destination)
+
+
+def file_db(all_dns, isdomain):
+    '''Open the sample file for db
+       And send line by line to each instance get_file_db
+       CALL FROM'''
+    print('=== Getting the db file ===')
+    path_read_db = os.path.join(os.getcwd(), DIR_READ, FILE_DB)
+    with open(path_read_db, 'r') as source:
+        for line in source:
+            for dns in all_dns:
+                dns.get_file_db(line)
 
 
 def ip_check(line, error):
@@ -188,9 +268,11 @@ def parse_sub_name(dns, conf, line):
         raise NameError(error)
 
 
-def get_conf(dns):
+def file_conf(all_dns):
     '''read and Parse the conf file in order to get all the dns attribut
        CALL FROM launch_dns_script()'''
+    dns = ServerDns()
+    all_dns.append(dns)
     print('=== Getting the conf ===')
     path_conf = os.path.join(os.getcwd(), FILE_CONF)
     with open(path_conf, 'r') as conf:
@@ -205,18 +287,20 @@ def get_conf(dns):
             for name in funcdict:
                 if name in line:
                     funcdict[name](dns, conf, line)
+    for dns in all_dns:
         print(dns)
 
 
-def launch_dns_script():
+def launch_dns_script(isdomain):
     '''start to deploy dns server with the file conf
-       and write all the dns file
+       and write all the dns file.
+       all_dns[] contains all the DOMAIN NAME of the conf
        CALL FROM main'''
-    dns = ServerDns()
-    get_conf(dns)
-#    dns.write_local()
-#    dns.write_option()
-#    dns.write_db()
+    all_dns = []
+    file_conf(all_dns)
+    file_local(all_dns, isdomain)
+#    file_option(all_dns, isdomain) not done yet
+    file_db(all_dns, isdomain) #not finished yet 
 
 
 def init_args_parser():
@@ -224,33 +308,35 @@ def init_args_parser():
     CALL FROM main()'''
     parser = argparse.ArgumentParser(description='Read the README.md before.')
     metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
-    help_parse = 'Add a subdomain on one domain of your dns server.'
-    parser.add_argument('-add',
-                        nargs=3,
-                        metavar=metavar_parse,
+    help_parse = 'Add a domain on your dns server, please launch on root the script and add the path of your bind9 conf ex: -domain \'/etc/bind/\''
+    parser.add_argument('-domain',
+                        nargs=1,
+                        metavar='PATH_BIND_CONF',
                         help=help_parse)
     args = parser.parse_args()
+    print(args)
     return args
 
 
 def main():
-    '''launch the subdomain script it option -add,
+    '''launch the domain script if option -domain,
        launch the dns script if no option
        and handle any error that happen during the program'''
     try:
-        args = init_args_parser()
-        if args.add:
-            launch_subdomain_script(args.add[0], args.add[1], args.add[2])
-        else:
-            launch_dns_script()
+    args = init_args_parser()
+    launch_dns_script(args.domain)
     except OSError as err:
             print("OS error: {0}".format(err))
     except NameError as err:
         print(err)
+    except ValueError as err:
+        print(err)
+    except TypeError as err:
+        print(err)
+    except AttributeError as err:
+        print(err)
     except:
-        print('Goodbye, world! ')
-        #, sys.exc_info()[0])
-
+        print('Goodbye, world! ', sys.exc_info()[0])
 
 if __name__ == '__main__':
     status = main()

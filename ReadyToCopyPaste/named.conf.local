@@ -1,0 +1,6 @@
+# mangin.tk
+zone "mangin.tk" {
+        type master;
+        file "/etc/bind/db.mangin.tk";
+};
+
