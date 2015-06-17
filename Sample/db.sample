@@ -15,4 +15,4 @@ ns1	IN	A	__IP_SERVER__
 ns?	IN	A	__SLAVE__
 
 ;Hostname entries
-__SUB_NAME_	IN	A	_SUB_IP_
+__SUB_NAME__	IN	A	__SUB_IP__

@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/11 18:29:19 by gmangin                                   #
+#    Updated: 2015/06/17 16:57:26 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -109,7 +109,9 @@ class ServerDns(object):
     def replace_domain_name(self, line, destination):
         if 'IN' and 'ns?.' in line:
             for index, value in enumerate(self.slaves):
-                destination.write(line.replace('?.__DOMAIN_NAME__', str(index + 2) + '.' + self.domain_name))
+                replace_domain = str(index + 2) + '.' + self.domain_name
+                destination.write(line.replace('?.__DOMAIN_NAME__',
+                                               replace_domain))
         else:
             destination.write(line.replace('__DOMAIN_NAME__', self.domain_name))
 
@@ -125,7 +127,10 @@ class ServerDns(object):
                 destination.write(line.replace('__SLAVE__', value))
 
     def replace_suddomain(self, line, destination):
-        destination.write(self._subdomain)
+        for name in self._subdomain:
+            keep = line
+            test = keep.replace('__SUB_NAME__', name)
+            destination.write(test.replace('__SUB_IP__', self._subdomain[name]))
 
     def replace_ismaster(self, line, destination):
         if self.ismaster:
@@ -300,10 +305,10 @@ def launch_dns_script(isdomain):
     file_conf(all_dns)
     file_local(all_dns, isdomain)
 #    file_option(all_dns, isdomain) not done yet
-    file_db(all_dns, isdomain) #not finished yet 
+    file_db(all_dns, isdomain)
 
 
-def init_args_parser():
+def init_args_parser(args):
     '''parse the sys.args with argparse and return the result
     CALL FROM main()'''
     parser = argparse.ArgumentParser(description='Read the README.md before.')
@@ -313,9 +318,7 @@ def init_args_parser():
                         nargs=1,
                         metavar='PATH_BIND_CONF',
                         help=help_parse)
-    args = parser.parse_args()
-    print(args)
-    return args
+    return parser.parse_args(args)
 
 
 def main():
@@ -323,8 +326,9 @@ def main():
        launch the dns script if no option
        and handle any error that happen during the program'''
     try:
-    args = init_args_parser()
-    launch_dns_script(args.domain)
+        args = init_args_parser(sys.argv[1:])
+        print(args)
+        launch_dns_script(args.domain)
     except OSError as err:
             print("OS error: {0}".format(err))
     except NameError as err:

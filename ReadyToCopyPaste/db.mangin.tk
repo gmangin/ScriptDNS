@@ -16,3 +16,144 @@ ns2	IN	A	195.154.123.215
 
 ;Hostname entries
 __SUB_NAME_	IN	A	_SUB_IP_
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+__SUB_NAME_	IN	A	_SUB_IP_
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+__SUB_NAME_	IN	A	_SUB_IP_
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+test1	IN	A	8.8.8.8
+unicorn	IN	A	195.154.123.215
+puducul	IN	A	212.47.231.148
+test2	IN	A	8.8.8.8
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+test2	IN	A	8.8.8.8
+test1	IN	A	8.8.8.8
+unicorn	IN	A	195.154.123.215
+puducul	IN	A	212.47.231.148
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+unicorn	IN	A	195.154.123.215
+puducul	IN	A	212.47.231.148
+test1	IN	A	8.8.8.8
+test2	IN	A	8.8.8.8
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+test1	IN	A	8.8.8.8
+test2	IN	A	8.8.8.8
+unicorn	IN	A	195.154.123.215
+puducul	IN	A	212.47.231.148
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	mangin.tk. root.mangin.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mangin.tk.
+@	IN	NS	ns2.mangin.tk.
+@	IN	A	62.210.75.32
+ns1	IN	A	62.210.75.32
+ns2	IN	A	195.154.123.215
+
+;Hostname entries
+test2	IN	A	8.8.8.8
+unicorn	IN	A	195.154.123.215
+test1	IN	A	8.8.8.8
+puducul	IN	A	212.47.231.148

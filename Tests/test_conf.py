@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/11 14:41:51 by gmangin                                   #
-#    Updated: 2015/06/11 14:45:25 by gmangin                                   #
+#    Updated: 2015/06/17 17:34:13 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,3 +23,14 @@
 #...
 
 #conf avec plusieurs DOMAIN NAME, 2 bien remplis, et aussi 2 mal remplis pour voir ^^
+
+import unittest
+import sys
+import main
+
+class TestConf(unittest.TestCase):
+    pass
+
+
+if __name__ == '__main__':
+    unittest.main()
