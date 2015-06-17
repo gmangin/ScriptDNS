@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/17 19:02:34 by gmangin                                   #
+#    Updated: 2015/06/17 19:46:27 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -210,18 +210,26 @@ def file_local(all_dns, isdomain):
 
 
 def file_option(all_dns, isdomain):
+    '''Create a new dns instance with the ip server(dns.ip) and the
+       others ip involve in all the dns (dns.slaves) in order to
+       fullfill FILE_OPTIONS 
+       CALL FROM'''
     print('=== Getting the options file ===')
+    globalDns = ServerDns()
+    for dns in all_dns:
+        globalDns.ip = dns.ip
+        if not dns.ismaster:
+            globalDns.slaves = dns.master
+        for slave in dns.slaves:
+            if slave != dns.ip:
+                globalDns.slaves = slave
+#    print(globalDns)
     path_write_options = os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
     path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
-    print("write: {!r}".format(path_write_options))
-    print(path_read_options)
     with open(path_write_options, 'a') as destination:
         with open(path_read_options, 'r') as source:
             for line in source:
-                print(line)
-                print('c')
-                for dns in all_dns:
-                    dns.get_file_options(destination, line)
+                globalDns.get_file_options(destination, line)
 
 
 def file_db(all_dns, isdomain):

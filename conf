@@ -1,18 +1,19 @@
 # add the server ip where you want to put the dns files
-IP_SERVER : 62.210.75.32
+IP_SERVER : 195.154.123.216
 
 # this is your domain s name
 DNS       : mangin.tk
 
 # if it is the master server put YES,
 # if not put the master server IP
-MASTER    : YES
+MASTER    : 62.210.75.32
 
 # if it is the slave server put YES
 # if not put the slave server IP
 # if you don't have slave, put NO
 SLAVE     : 195.154.123.215
-SLAVE     : NO
+SLAVE     : 195.154.123.216
+SLAVE     : 195.154.123.217
 
 # subdomain1's name and the subdomain1's ip
 SUB_NAME  : unicorn
