@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/17 16:57:26 by gmangin                                   #
+#    Updated: 2015/06/17 19:02:34 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -104,9 +104,12 @@ class ServerDns(object):
         return '-Is_master   : {}'.format(self._is_master)
 
     def replace_ip(self, line, destination):
+        '''Replace in Sample FILE the value __IP_SERVER__'''
         destination.write(line.replace('__IP_SERVER__', self.ip))
 
     def replace_domain_name(self, line, destination):
+        '''Replace in Sample FILE the value __DOMAIN_NAME__
+           if there is many slave it will add ns+number automatically'''
         if 'IN' and 'ns?.' in line:
             for index, value in enumerate(self.slaves):
                 replace_domain = str(index + 2) + '.' + self.domain_name
@@ -116,25 +119,41 @@ class ServerDns(object):
             destination.write(line.replace('__DOMAIN_NAME__', self.domain_name))
 
     def replace_master(self, line, destination):
+        '''Replace in Sample FILE the value __SLAVE__
+           we keep the line with SLAVE if there is many dns in the conf
+           anyway, the cleaner will erase it at the end of the script <3'''
         destination.write(line.replace('__MASTER__', self.master))
+#        destination.write(line)
 
     def replace_slaves(self, line, destination):
+        '''Replace in Sample FILE the value __SLAVE__
+           we keep the line with SLAVE if there is many dns in the conf
+           anyway, the cleaner will erase it at the end of the script <3'''
         for index, value in enumerate(self.slaves):
             if 'IN' and 'ns?' in line:
                 test = line.replace('?', str(index + 2))
                 destination.write(test.replace('__SLAVE__', value))
             else:
                 destination.write(line.replace('__SLAVE__', value))
+#        destination.write(line)
 
     def replace_suddomain(self, line, destination):
+        '''Replace in Sample FILE the value __SUB_NAME__ and __SUB_IP__'''
         for name in self._subdomain:
-            keep = line
-            test = keep.replace('__SUB_NAME__', name)
+            test = line.replace('__SUB_NAME__', name)
             destination.write(test.replace('__SUB_IP__', self._subdomain[name]))
 
     def replace_ismaster(self, line, destination):
-        if self.ismaster:
+        '''Replace in Sample FILE the value __ISMASTER__
+           we keep the line with ISMASTER if there is many dns in the conf
+           anyway, the cleaner will erase it at the end of the script <3
+           CALL only for FILE_OPTIONS '''
+        if not self.ismaster:
             destination.write(line.replace('__ISMASTER__', self.master))
+        else:
+            for name in self.slaves:
+                destination.write(line.replace('__ISMASTER__', name))
+#        destination.write(line)
 
     def replace_value(self, line, destination):
         funcdict = {
@@ -166,9 +185,9 @@ class ServerDns(object):
             for line in source:
                 self.replace_value(line, destination)
 
-    def get_file_option(self):
+    def get_file_options(self, destination, line):
         '''fullfill FILE_OPTIONS with master and slaves info'''
-        path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
+        self.replace_value(line, destination)
 
     def get_file_db(self, line):
         '''fullfill FILE_DB with domain_name, master,
@@ -192,10 +211,17 @@ def file_local(all_dns, isdomain):
 
 def file_option(all_dns, isdomain):
     print('=== Getting the options file ===')
-    path_write_options = all_dns, os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
+    path_write_options = os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
+    path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
+    print("write: {!r}".format(path_write_options))
+    print(path_read_options)
     with open(path_write_options, 'a') as destination:
-        for dns in all_dns:
-            dns.get_file_options(destination)
+        with open(path_read_options, 'r') as source:
+            for line in source:
+                print(line)
+                print('c')
+                for dns in all_dns:
+                    dns.get_file_options(destination, line)
 
 
 def file_db(all_dns, isdomain):
@@ -304,13 +330,13 @@ def launch_dns_script(isdomain):
     all_dns = []
     file_conf(all_dns)
     file_local(all_dns, isdomain)
-#    file_option(all_dns, isdomain) not done yet
     file_db(all_dns, isdomain)
+    file_option(all_dns, isdomain)
 
 
 def init_args_parser(args):
     '''parse the sys.args with argparse and return the result
-    CALL FROM main()'''
+       CALL FROM main()'''
     parser = argparse.ArgumentParser(description='Read the README.md before.')
     metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
     help_parse = 'Add a domain on your dns server, please launch on root the script and add the path of your bind9 conf ex: -domain \'/etc/bind/\''
