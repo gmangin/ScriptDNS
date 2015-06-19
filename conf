@@ -1,29 +1,51 @@
 # add the server ip where you want to put the dns files
-IP_SERVER : 195.154.123.216
+IP_SERVER : 8.8.8.8
 
+#### 1 dns ####
 # this is your domain s name
-DNS       : mangin.tk
-
+DNS       : example.com
 # if it is the master server put YES,
 # if not put the master server IP
-MASTER    : 62.210.75.32
-
+MASTER    : YES
 # if it is the slave server put YES
 # if not put the slave server IP
 # if you don't have slave, put NO
-SLAVE     : 195.154.123.215
-SLAVE     : 195.154.123.216
-SLAVE     : 195.154.123.217
-
+SLAVE     : 8.8.8.1
+SLAVE     : 8.8.8.2
+SLAVE     : 8.8.8.3
 # subdomain1's name and the subdomain1's ip
 SUB_NAME  : unicorn
-SUB_IP    : 195.154.123.215
+SUB_IP    : 8.8.8.4
 # 2nd subdomain
-SUB_NAME  : puducul
-SUB_IP    : 212.47.231.148
+SUB_NAME  : pony
+SUB_IP    : 8.8.8.5
 # 3rd subdomain
-SUB_NAME  : test1
-SUB_IP    : 8.8.8.8
+SUB_NAME  : cat
+SUB_IP    : 8.8.8.6
 # 4th subdomain ...
-SUB_NAME  : test2
-SUB_IP    : 8.8.8.8
+SUB_NAME  : dog
+SUB_IP    : 8.8.8.7
+
+#### 2 dns ####
+DNS       : test.com
+
+MASTER    : 8.8.8.11
+
+SLAVE     : YES
+SLAVE     : 8.8.8.9
+SLAVE     : 8.8.8.10
+
+SUB_NAME  : unicorn
+SUB_IP    : 8.8.8.3
+
+#### 3 dns ####
+DNS       : coucou.tk
+
+MASTER    : YES
+
+SLAVE     : 8.8.8.13
+SLAVE     : 8.8.8.14
+SLAVE     : 8.8.8.1
+
+SUB_NAME  : unicorn
+SUB_IP    : 8.8.8.1

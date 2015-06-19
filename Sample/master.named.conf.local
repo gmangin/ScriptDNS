@@ -1,6 +1,6 @@
-# __DOMAIN_NAME__
-zone "__DOMAIN_NAME__" {
+# _DOMAIN_NAME_
+zone "_DOMAIN_NAME_" {
         type master;
-        file "/etc/bind/db.__DOMAIN_NAME__";
+        file "/etc/bind/db._DOMAIN_NAME_";
 };
 

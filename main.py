@@ -1,12 +1,7 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                                              #
-#    main.py                                                                   #
-#                                                                              #
-#    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
+#
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/17 19:46:27 by gmangin                                   #
+#    Updated: 2015/06/19 11:42:16 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -101,78 +96,71 @@ class ServerDns(object):
             print('-Subdomain   : ')
             for sub_name, sub_ip in self._subdomain.items():
                 print('  * {0:8} = {1:}'.format(sub_name, sub_ip))
-        return '-Is_master   : {}'.format(self._is_master)
+        if self._is_master:
+            return 'I am the master !'
+        else:
+            return 'I am only a slave !'
 
     def replace_ip(self, line, destination):
-        '''Replace in Sample FILE the value __IP_SERVER__'''
-        destination.write(line.replace('__IP_SERVER__', self.ip))
+        '''Replace in Sample FILE the value _IP_SERVER_'''
+        destination.write(line.replace('_IP_SERVER_', self.ip))
 
     def replace_domain_name(self, line, destination):
-        '''Replace in Sample FILE the value __DOMAIN_NAME__
+        '''Replace in Sample FILE the value _DOMAIN_NAME_
            if there is many slave it will add ns+number automatically'''
         if 'IN' and 'ns?.' in line:
             for index, value in enumerate(self.slaves):
                 replace_domain = str(index + 2) + '.' + self.domain_name
-                destination.write(line.replace('?.__DOMAIN_NAME__',
+                destination.write(line.replace('?._DOMAIN_NAME_',
                                                replace_domain))
         else:
-            destination.write(line.replace('__DOMAIN_NAME__', self.domain_name))
+            destination.write(line.replace('_DOMAIN_NAME_', self.domain_name))
 
     def replace_master(self, line, destination):
-        '''Replace in Sample FILE the value __SLAVE__
-           we keep the line with SLAVE if there is many dns in the conf
-           anyway, the cleaner will erase it at the end of the script <3'''
-        destination.write(line.replace('__MASTER__', self.master))
-#        destination.write(line)
+        '''Replace in Sample FILE the value _MASTER_'''
+        destination.write(line.replace('_MASTER_', self.master))
 
     def replace_slaves(self, line, destination):
-        '''Replace in Sample FILE the value __SLAVE__
-           we keep the line with SLAVE if there is many dns in the conf
-           anyway, the cleaner will erase it at the end of the script <3'''
+        '''Replace in Sample FILE the value _SLAVE_'''
         for index, value in enumerate(self.slaves):
             if 'IN' and 'ns?' in line:
                 test = line.replace('?', str(index + 2))
-                destination.write(test.replace('__SLAVE__', value))
+                destination.write(test.replace('_SLAVE_', value))
             else:
-                destination.write(line.replace('__SLAVE__', value))
-#        destination.write(line)
+                destination.write(line.replace('_SLAVE_', value))
 
     def replace_suddomain(self, line, destination):
-        '''Replace in Sample FILE the value __SUB_NAME__ and __SUB_IP__'''
+        '''Replace in Sample FILE the value _SUB_NAME_ and _SUB_IP_'''
         for name in self._subdomain:
-            test = line.replace('__SUB_NAME__', name)
-            destination.write(test.replace('__SUB_IP__', self._subdomain[name]))
+            test = line.replace('_SUB_NAME_', name)
+            destination.write(test.replace('_SUB_IP_', self._subdomain[name]))
 
     def replace_ismaster(self, line, destination):
-        '''Replace in Sample FILE the value __ISMASTER__
-           we keep the line with ISMASTER if there is many dns in the conf
-           anyway, the cleaner will erase it at the end of the script <3
+        '''Replace in Sample FILE the value _ISMASTER_
            CALL only for FILE_OPTIONS '''
         if not self.ismaster:
-            destination.write(line.replace('__ISMASTER__', self.master))
+            destination.write(line.replace('_ISMASTER_', self.master))
         else:
             for name in self.slaves:
-                destination.write(line.replace('__ISMASTER__', name))
-#        destination.write(line)
+                destination.write(line.replace('_ISMASTER_', name))
 
     def replace_value(self, line, destination):
         funcdict = {
-            '__IP_SERVER__': self.replace_ip,
-            '__DOMAIN_NAME__' : self.replace_domain_name,
-            '__MASTER__' : self.replace_master,
-            '__SLAVE__' : self.replace_slaves,
-            '__SUB_NAME__' : self.replace_suddomain,
-            '__ISMASTER__' : self.replace_ismaster
+            '_IP_SERVER_': self.replace_ip,
+            '_DOMAIN_NAME_': self.replace_domain_name,
+            '_MASTER_': self.replace_master,
+            '_SLAVE_': self.replace_slaves,
+            '_SUB_NAME_': self.replace_suddomain,
+            '_ISMASTER_': self.replace_ismaster
         }
         find = 0
         for name in funcdict:
             if name in line:
-                print(name)
                 funcdict[name](line, destination)
                 find = 1
         if not find:
             destination.write(line)
-                    
+
     def get_file_local(self, destination):
         '''Open the correct FILE_LOCAL (master or slave)
            and call replace() to fullfill FILE_LOCAL info'''
@@ -192,38 +180,47 @@ class ServerDns(object):
     def get_file_db(self, line):
         '''fullfill FILE_DB with domain_name, master,
            slaves and subdomain info'''
-        if self.ismaster:
-            write_file_db = FILE_DB.replace('sample', self.domain_name)
-            path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
-            with open(path_write_db, 'a') as destination:
-                self.replace_value(line, destination)
+        write_file_db = FILE_DB.replace('sample', self.domain_name)
+        path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
+        with open(path_write_db, 'a') as destination:
+            self.replace_value(line, destination)
 
 
 def file_local(all_dns, isdomain):
     '''Prepare the local file, send it to dns.get_file_local to be written
        Call from'''
-    print('=== Getting the local file ===')
+    print('\n=== Getting the local file ===')
     path_write_local = os.path.join(os.getcwd(), DIR_WRITE, FILE_LOCAL)
     with open(path_write_local, 'a') as destination:
         for dns in all_dns:
             dns.get_file_local(destination)
 
 
-def file_option(all_dns, isdomain):
+def global_dns_ip(all_dns):
     '''Create a new dns instance with the ip server(dns.ip) and the
-       others ip involve in all the dns (dns.slaves) in order to
-       fullfill FILE_OPTIONS 
-       CALL FROM'''
-    print('=== Getting the options file ===')
+       others ip involve in all the dns (dns.slaves)
+       CALL FROM file_option'''
     globalDns = ServerDns()
     for dns in all_dns:
         globalDns.ip = dns.ip
-        if not dns.ismaster:
+        #in order to avoid doublon, check if the ip is not already registered
+        if not dns.ismaster and dns.master not in globalDns.slaves:
             globalDns.slaves = dns.master
-        for slave in dns.slaves:
-            if slave != dns.ip:
-                globalDns.slaves = slave
-#    print(globalDns)
+        else:
+            for slave in dns.slaves:
+                if slave != dns.ip and slave not in globalDns.slaves:
+                    globalDns.slaves = slave
+    return globalDns
+
+
+def file_option(all_dns, isdomain):
+    '''Create a new dns instance with the ip server(dns.ip) and the
+       others ip involve in all the dns (dns.slaves) in order to
+       fullfill FILE_OPTIONS
+       CALL FROM'''
+    print('\n=== Getting the options file ===')
+    globalDns = global_dns_ip(all_dns)
+    print(globalDns)
     path_write_options = os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
     path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
     with open(path_write_options, 'a') as destination:
@@ -236,12 +233,13 @@ def file_db(all_dns, isdomain):
     '''Open the sample file for db
        And send line by line to each instance get_file_db
        CALL FROM'''
-    print('=== Getting the db file ===')
+    print('\n=== Getting the db file ===')
     path_read_db = os.path.join(os.getcwd(), DIR_READ, FILE_DB)
     with open(path_read_db, 'r') as source:
         for line in source:
             for dns in all_dns:
-                dns.get_file_db(line)
+                if dns.ismaster:
+                    dns.get_file_db(line)
 
 
 def ip_check(line, error):
@@ -256,24 +254,33 @@ def ip_check(line, error):
         raise
 
 
-def parse_ip_server(dns, conf, line):
+def parse_ip_server(dns, line):
     '''get the server ip from the conf file
        CALL FROM conf_parser'''
     dns.ip = ip_check(line, 'MISSING IP_SERVER')
+    return None
 
 
-def parse_dns(dns, conf, line):
+def parse_dns(dns, line):
     '''get the domaine name from the conf file
+       if it is a new dns, an new instance is created return
        CALL FROM conf_parser'''
     isdns = re.findall(': (.+)', line)
     if isdns:
-        dns.domain_name = isdns[0]
+        if dns.domain_name:
+            newDns = ServerDns()
+            newDns.ip = dns.ip
+            newDns.domain_name = isdns[0]
+            return newDns
+        else:
+            dns.domain_name = isdns[0]
     else:
         error = 'MISSING DNS - domain s name {!r} '.format(line)
         raise NameError(error)
+    return None
 
 
-def parse_master(dns, conf, line):
+def parse_master(dns, line):
     '''get the master ip from the conf file
        CALL FROM conf_parser'''
     if re.search('YES', line):
@@ -281,16 +288,18 @@ def parse_master(dns, conf, line):
     else:
         dns.ismaster = False
         dns.master = ip_check(line, 'MISSING YES or IP MASTER')
+    return None
 
 
-def parse_slave(dns, conf, line):
+def parse_slave(dns, line):
     '''get the slave ip from the conf file if there is/are slave(s)
        CALL FROM conf_parser'''
     if not re.search('YES', line) and not re.search('NO', line):
         dns.slaves = ip_check(line, 'MISSING YES NO or IP SLAVE')
+    return None
 
 
-def parse_sub_name(dns, conf, line):
+def parse_sub_name(dns, line):
     '''get the subdomain name and ip from the conf file
        if there is/are subdomain(s)
        CALL FROM conf_parser'''
@@ -298,36 +307,64 @@ def parse_sub_name(dns, conf, line):
     if not sub_name:
         error = 'MISSING SUB_NAME - subdomain\'s name {!r} '.format(line)
         raise NameError(error)
-    sub_ip = conf.readline()
-    if 'SUB_IP' in sub_ip:
-        ip = ip_check(sub_ip, 'MISSING subdomain\'s ip')
-        dns.suddomain = {sub_name[0]: ip}
-    else:
-        error = 'MISSING SUB_IP - subdomain\'s ip {!r}'.format(line)
-        raise NameError(error)
+    dns.suddomain = {sub_name[0]: ''}
+    return None
+
+
+def parse_sub_ip(dns, line):
+    for name in dns.suddomain:
+        if dns.suddomain[name] == '':
+            ip = ip_check(line, 'MISSING subdomain\'s ip')
+            dns.suddomain[name] = ip
+            return None
+    error = 'MISSING SUB_IP - subdomain\'s ip {!r}'.format(line)
+    raise NameError(error)
+
+
+def check_conf(all_dns):
+    for dns in all_dns:
+        if not dns.ip or not dns.master or not dns.domain_name:
+            error = 'Conf not valid !'
+            raise NameError(error)
+        
+
+def parse_conf(all_dns, conf):
+    '''Parse the conf file in order to get all the dns attribut
+       CALL FROM file_conf'''
+    funcdict = {
+        'IP_SERVER': parse_ip_server,
+        'DNS': parse_dns,
+        'MASTER': parse_master,
+        'SLAVE': parse_slave,
+        'SUB_NAME': parse_sub_name,
+        'SUB_IP': parse_sub_ip
+    }
+    dns = ServerDns()
+    all_dns.append(dns)
+    for line in conf:
+        for name in funcdict:
+            if name in line:
+                newDns = funcdict[name](dns, line)
+                if newDns:
+                    all_dns.append(newDns)
+                    dns = newDns
+
+
+def print_dns(all_dns):
+    for dns in all_dns:
+        print('\n= NEW DNS =')
+        print(dns)
 
 
 def file_conf(all_dns):
     '''read and Parse the conf file in order to get all the dns attribut
        CALL FROM launch_dns_script()'''
-    dns = ServerDns()
-    all_dns.append(dns)
     print('=== Getting the conf ===')
     path_conf = os.path.join(os.getcwd(), FILE_CONF)
     with open(path_conf, 'r') as conf:
-        funcdict = {
-            'IP_SERVER': parse_ip_server,
-            'DNS': parse_dns,
-            'MASTER': parse_master,
-            'SLAVE': parse_slave,
-            'SUB_NAME': parse_sub_name
-        }
-        for line in conf:
-            for name in funcdict:
-                if name in line:
-                    funcdict[name](dns, conf, line)
-    for dns in all_dns:
-        print(dns)
+        parse_conf(all_dns, conf)
+        check_conf(all_dns)
+        print_dns(all_dns)
 
 
 def launch_dns_script(isdomain):
@@ -346,8 +383,12 @@ def init_args_parser(args):
     '''parse the sys.args with argparse and return the result
        CALL FROM main()'''
     parser = argparse.ArgumentParser(description='Read the README.md before.')
-    metavar_parse = ('DOMAIN_NAME', 'SUBDOMAIN_NAME', 'SUBDOMAIN_IP')
-    help_parse = 'Add a domain on your dns server, please launch on root the script and add the path of your bind9 conf ex: -domain \'/etc/bind/\''
+    help_parse = '''
+    Add a domain on your dns server,
+    Please launch on root the script
+    And add the path of your bind9 conf
+    Ex: -domain \'/etc/bind/\'
+    '''
     parser.add_argument('-domain',
                         nargs=1,
                         metavar='PATH_BIND_CONF',
@@ -361,7 +402,6 @@ def main():
        and handle any error that happen during the program'''
     try:
         args = init_args_parser(sys.argv[1:])
-        print(args)
         launch_dns_script(args.domain)
     except OSError as err:
             print("OS error: {0}".format(err))
