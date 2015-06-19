@@ -1,0 +1,13 @@
+IP_SERVER : 8.8.8.8
+
+DNS       : example.com
+
+MASTER    : 8.8.8.1
+
+SLAVE     : 8.8.8.2
+SLAVE     : YES
+SLAVE     : NO
+
+SUB_NAME  : test
+SUB_IP    : 8.8.8.10
+
