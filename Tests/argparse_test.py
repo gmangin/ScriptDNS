@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/18 14:11:43 by gmangin                                   #
-#    Updated: 2015/06/18 14:11:45 by gmangin                                   #
+#    Updated: 2015/06/23 01:12:44 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,6 +44,23 @@ class TestFunctionArgsParse(unittest.TestCase):
             pass
         else:
             self.fail('Did not see exception')
+
+    def test_launch_dns_script_wrong_path(self):
+        '''Test launch_dns_script with wrong path in arg option'''
+        try:
+            main.launch_dns_script('coucou')
+        except NameError:
+            pass
+        else:
+            self.fail('Did not see exception')
+
+#    def test_launch_dns_script_correct_path(self):
+#        '''Test launch_dns_script with a correct path in arg option'''
+#        main.launch_dns_script('.')
+
+#    def test_launch_dns_script_correct_path(self):
+#        '''Go main !'''
+#        main.main()
 
 
 def argparse_wrong_arg():

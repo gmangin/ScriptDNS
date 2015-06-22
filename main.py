@@ -1,7 +1,7 @@
 #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/19 11:42:16 by gmangin                                   #
+#    Updated: 2015/06/23 01:05:15 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -177,23 +177,29 @@ class ServerDns(object):
         '''fullfill FILE_OPTIONS with master and slaves info'''
         self.replace_value(line, destination)
 
-    def get_file_db(self, line):
+    def get_file_db(self, line, isdomain):
         '''fullfill FILE_DB with domain_name, master,
            slaves and subdomain info'''
         write_file_db = FILE_DB.replace('sample', self.domain_name)
-        path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
+        if isdomain:
+            path_write_db = os.path.join(isdomain, write_file_db)
+        else:
+            path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
         with open(path_write_db, 'a') as destination:
             self.replace_value(line, destination)
-
 
 def file_local(all_dns, isdomain):
     '''Prepare the local file, send it to dns.get_file_local to be written
        Call from'''
     print('\n=== Getting the local file ===')
-    path_write_local = os.path.join(os.getcwd(), DIR_WRITE, FILE_LOCAL)
+    if isdomain:
+        path_write_local = os.path.join(isdomain, FILE_LOCAL)
+    else:
+        path_write_local = os.path.join(os.getcwd(), DIR_WRITE, FILE_LOCAL)
     with open(path_write_local, 'a') as destination:
         for dns in all_dns:
             dns.get_file_local(destination)
+    print('Writting {} in {} directory'.format(FILE_LOCAL, isdomain))
 
 
 def global_dns_ip(all_dns):
@@ -220,14 +226,17 @@ def file_option(all_dns, isdomain):
        CALL FROM'''
     print('\n=== Getting the options file ===')
     globalDns = global_dns_ip(all_dns)
-    print(globalDns)
-    path_write_options = os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
+    print(globalDns) # a faire un jolie print option quand meme ^^
+    if isdomain:
+        path_write_options = os.path.join(isdomain, FILE_OPTIONS)
+    else:
+        path_write_options = os.path.join(os.getcwd(), DIR_WRITE, FILE_OPTIONS)
     path_read_options = os.path.join(os.getcwd(), DIR_READ, FILE_OPTIONS)
     with open(path_write_options, 'a') as destination:
         with open(path_read_options, 'r') as source:
             for line in source:
                 globalDns.get_file_options(destination, line)
-
+            print('Writting {} in {} directory'.format(FILE_OPTIONS, isdomain))
 
 def file_db(all_dns, isdomain):
     '''Open the sample file for db
@@ -239,7 +248,8 @@ def file_db(all_dns, isdomain):
         for line in source:
             for dns in all_dns:
                 if dns.ismaster:
-                    dns.get_file_db(line)
+                    dns.get_file_db(line, isdomain)
+        print('Writting the db file in {} directory'.format(isdomain))
 
 
 def ip_check(line, error):
@@ -356,24 +366,29 @@ def print_dns(all_dns):
         print(dns)
 
 
-def file_conf(all_dns):
+def file_conf():
     '''read and Parse the conf file in order to get all the dns attribut
+       all_dns[] contains all the DOMAIN NAME of the conf
        CALL FROM launch_dns_script()'''
     print('=== Getting the conf ===')
+    all_dns = []
     path_conf = os.path.join(os.getcwd(), FILE_CONF)
     with open(path_conf, 'r') as conf:
         parse_conf(all_dns, conf)
-        check_conf(all_dns)
-        print_dns(all_dns)
+    check_conf(all_dns)
+    print_dns(all_dns)
+    return(all_dns)
 
 
 def launch_dns_script(isdomain):
     '''start to deploy dns server with the file conf
        and write all the dns file.
        all_dns[] contains all the DOMAIN NAME of the conf
+       if the domain option is active, we check is the path is correct
        CALL FROM main'''
-    all_dns = []
-    file_conf(all_dns)
+    if isdomain and not os.path.isdir(isdomain):
+        raise NameError('this path is not correct : {!r}'.format(isdomain))
+    all_dns = file_conf()
     file_local(all_dns, isdomain)
     file_db(all_dns, isdomain)
     file_option(all_dns, isdomain)
@@ -402,7 +417,7 @@ def main():
        and handle any error that happen during the program'''
     try:
         args = init_args_parser(sys.argv[1:])
-        launch_dns_script(args.domain)
+        launch_dns_script(args.domain[0])
     except OSError as err:
             print("OS error: {0}".format(err))
     except NameError as err:

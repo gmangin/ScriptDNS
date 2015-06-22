@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/18 14:12:03 by gmangin                                   #
-#    Updated: 2015/06/19 20:51:56 by gmangin                                   #
+#    Updated: 2015/06/23 00:19:41 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -288,6 +288,11 @@ I am only a slave !
 I am the master !
 '''
         self.assertEqual(sys.stdout.getvalue(), out)
+
+    #not done yet !
+    def test_file_conf(self):
+        to_check = main.file_conf()
+        self.assertNotEqual(to_check, [])
 
 
 def start_function(here):
