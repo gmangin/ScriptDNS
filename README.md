@@ -18,6 +18,7 @@
 YOU NEED A DOMAIN NAME AND A SERVER
 
 * On the master server, install bind9
+
 > sudo apt-get install bind9
 
 ## DNS Script to deploy an server dns
@@ -29,23 +30,23 @@ YOU NEED A DOMAIN NAME AND A SERVER
 
 * There is log in order to check if everything went well :)
 
-## Just add a subdomain
-
-* you won't need the conf, just launch the script with the option -add :
-> python3.4 main.py -add [domain name] [subdomain name] [subdomain ip]
-
-* you just have to precise to which domain you want to add the subdomain. And subdomain name and ip ofcourse.
-
-* There is log in order to check if everything went well :)
+## Option root not set yet
 
 # CMD BASIC
 
 * in order to deploy a dns server (don't forget to fullfill the conf file)
 
-> python3.4 main.py
+> python3 main.py
 
-* in order to add a subdomain to any domain on your server.
+# Unit Tests
 
-> python3.4 main.py -add [domain name] [subdomain name] [subdomain ip]
+* in order to deploy unit test :
+
+> python3 test.py
+
+* or even better : 
+
+> python3 -m unittest discover
+
 
 # Have Fun !
