@@ -37,9 +37,15 @@ YOU NEED A DOMAIN NAME AND A SERVER
 
 > python3 main.py
 
+# Unit Tests
+
 * in order to deploy unit test :
 
 > python3 test.py
+
+* or even better : 
+
+> python3 -m unittest discover
 
 
 # Have Fun !
