@@ -18,6 +18,7 @@
 YOU NEED A DOMAIN NAME AND A SERVER
 
 * On the master server, install bind9
+
 > sudo apt-get install bind9
 
 ## DNS Script to deploy an server dns
