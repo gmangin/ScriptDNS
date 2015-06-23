@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/18 14:12:03 by gmangin                                   #
-#    Updated: 2015/06/23 00:19:41 by gmangin                                   #
+#    Updated: 2015/06/23 23:20:08 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,7 @@ class TestFunctionFileConf(unittest.TestCase):
         dns = main.ServerDns()
         line = 'SUB_NAME  : unicorn'
         main.parse_sub_name(dns, line)
-        self.assertEqual(dns.suddomain, {'unicorn': ''})
+        self.assertEqual(dns.subdomain, {'unicorn': ''})
 
     def test_parse_sub_name_no_correct(self):
         '''Test parse_sub_name() function with no SUB_NAME'''
@@ -96,7 +96,7 @@ class TestFunctionFileConf(unittest.TestCase):
         main.parse_sub_name(dns, line)
         line = 'SUB_IP  : 8.8.8.8'
         main.parse_sub_ip(dns, line)
-        self.assertEqual(dns.suddomain, {'unicorn': '8.8.8.8'})
+        self.assertEqual(dns.subdomain, {'unicorn': '8.8.8.8'})
 
     def test_parse_sub_ip_no_correct0(self):
         '''Test parse_sub_name() function with no SUB_IP'''
@@ -191,23 +191,23 @@ class TestFunctionFileConf(unittest.TestCase):
         main.parse_master(dns, line)
         self.assertEqual(dns.master, '8.8.8.8')
 
-    def test_parse_ismaster_correct1(self):
+    def test_parse_is_master_correct1(self):
         '''Test parse_master function with correct conf and server is slave'''
         dns = main.ServerDns()
         line = 'IP_SERVER   : 8.8.8.1'
         main.parse_ip_server(dns, line)
         line = 'MASTER   : 8.8.8.8'
         main.parse_master(dns, line)
-        self.assertEqual(dns.ismaster, False)
+        self.assertEqual(dns.is_master, False)
 
-    def test_parse_ismaster_correct2(self):
+    def test_parse_is_master_correct2(self):
         '''Test parse_master function with correct conf and server is master'''
         dns = main.ServerDns()
         line = 'IP_SERVER   : 8.8.8.8'
         main.parse_ip_server(dns, line)
         line = 'MASTER   : YES'
         main.parse_master(dns, line)
-        self.assertEqual(dns.ismaster, True)
+        self.assertEqual(dns.is_master, True)
 
     def test_parse_master_no_correct1(self):
         '''Test parse_master() function with no MASTER'''
