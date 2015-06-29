@@ -6,7 +6,7 @@
 #    By: gmangin <gaelle.mangin@hotmail.fr>                                    #
 #                                                                              #
 #    Created: 2015/06/19 17:13:32 by gmangin                                   #
-#    Updated: 2015/06/24 00:24:33 by gmangin                                   #
+#    Updated: 2015/06/28 16:56:22 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,30 @@ import main
 
 class TestClass(unittest.TestCase):
 
-#        replace_value
+    def test_replace_value1(self):
+        '''Check replace_value function with no data'''
+        dns = main.ServerDns()
+        line = ''
+        to_check = dns.replace_value(line)
+        check = ['']
+        self.assertEqual(to_check, check)
+
+    def test_replace_value2(self):
+        '''Check replace_value function with a simple line'''
+        dns = main.ServerDns()
+        line = 'coucou'
+        to_check = dns.replace_value(line)
+        check = ['coucou']
+        self.assertEqual(to_check, check)
+
+    def test_replace_value3(self):
+        '''Check replace_value function with a line to replace'''
+        dns = main.ServerDns()
+        dns.ip = '8.8.8.8'
+        line = '_IP_SERVER_'
+        to_check = dns.replace_value(line)
+        check = ['8.8.8.8']
+        self.assertEqual(to_check, check)
 
     def test_replace_ip(self):
         '''Check replace_ip function with an ip'''
@@ -26,7 +49,6 @@ class TestClass(unittest.TestCase):
         check = [' coucou  coucou ']
         self.assertEqual(to_check, check)
 
-#FAIRE DES TESTS EN PLUS POUR LES SLAVES ...
     def test_replace_domain_name_1(self):
         '''Check replace_domain_name when there s no NS? and no slave'''
         dns = main.ServerDns()
@@ -110,7 +132,6 @@ class TestClass(unittest.TestCase):
         check = []
         self.assertEqual(to_check, check)
 
-#Need to check the dictionnary order trouble ...
     def test_replace_subdomain_2(self):
         '''Check replace_subdomain function when there is many subdomain
            in the conf file'''
@@ -120,7 +141,7 @@ class TestClass(unittest.TestCase):
         to_check = dns.replace_subdomain(line)
         check = [' coucou unicorn coucou  8.8.8.8 coucou ',
                  ' coucou Poney coucou  8.8.8.1 coucou ']
-        self.assertAlmostEqual(to_check, check)
+        map(lambda x, y: self.assertAlmostEqual(x, y), to_check, check)
 
 
 if __name__ == '__main__':

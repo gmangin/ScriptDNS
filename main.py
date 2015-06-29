@@ -1,7 +1,7 @@
 #
 #                                                                              #
 #    Created: 2015/06/09 17:33:49 by gmangin                                   #
-#    Updated: 2015/06/24 00:31:17 by gmangin                                   #
+#    Updated: 2015/06/28 17:44:59 by gmangin                                   #
 #                                                                              #
 # **************************************************************************** #
 
@@ -144,7 +144,7 @@ class ServerDns(object):
             array.append(test.replace('_SUB_IP_', self._subdomain[name]))
         return array
 
-    def replace_value(self, line, destination):
+    def replace_value(self, line):
         funcdict = {
             '_IP_SERVER_': self.replace_ip,
             '_DOMAIN_NAME_': self.replace_domain_name,
@@ -152,15 +152,13 @@ class ServerDns(object):
             '_SLAVE_': self.replace_slaves,
             '_SUB_NAME_': self.replace_subdomain,
         }
-        find = 0
+        lines = []
         for name in funcdict:
             if name in line:
-                array = funcdict[name](line)
-                for item in array:
-                    lines = destination.write(item)
-                    find = 1
-        if not find:
-            destination.write(line)
+                lines.extend(funcdict[name](line))
+        if not lines:
+            lines.append(line)
+        return lines
 
     def get_file_local(self, destination):
         '''Open the correct FILE_LOCAL (master or slave)
@@ -172,11 +170,15 @@ class ServerDns(object):
         path_read_local = os.path.join(os.getcwd(), DIR_READ, file_local)
         with open(path_read_local, 'r') as source:
             for line in source:
-                self.replace_value(line, destination)
+                array = self.replace_value(line)
+                for items in array:
+                    destination.write(items)
 
     def get_file_options(self, destination, line):
         '''fullfill FILE_OPTIONS with master and slaves info'''
-        self.replace_value(line, destination)
+        array = self.replace_value(line)
+        for items in array:
+            destination.write(items)
 
     def get_file_db(self, line, isdomain):
         '''fullfill FILE_DB with domain_name, master,
@@ -187,7 +189,11 @@ class ServerDns(object):
         else:
             path_write_db = os.path.join(os.getcwd(), DIR_WRITE, write_file_db)
         with open(path_write_db, 'a') as destination:
-            self.replace_value(line, destination)
+            array = self.replace_value(line)
+            for items in array:
+                destination.write(items)
+        return write_file_db
+
 
 def file_local(all_dns, isdomain):
     '''Prepare the local file, send it to dns.get_file_local to be written
@@ -245,13 +251,16 @@ def file_db(all_dns, isdomain):
        CALL FROM'''
     print('\n=== Getting the db file ===')
     path_read_db = os.path.join(os.getcwd(), DIR_READ, FILE_DB)
+    write_db = []
     with open(path_read_db, 'r') as source:
         for line in source:
             for dns in all_dns:
-                if dns.is_master:
-                    dns.get_file_db(line, isdomain)
-        print('Writting the db file in {} directory'.format(isdomain))
-
+                 if dns.is_master:
+                     new_db_file = dns.get_file_db(line, isdomain)
+                     if new_db_file not in write_db:
+                         write_db.append(new_db_file)
+        for db in write_db:
+            print('Writting the db file in {} directory'.format(db))
 
 def ip_check(line, error):
     '''Check if there is an ip in the line, if not return an exception
@@ -388,7 +397,7 @@ def launch_dns_script(isdomain):
        if the domain option is active, we check is the path is correct
        CALL FROM main'''
     all_dns = file_conf()
-    file_local(all_dns, isdomain)
+#    file_local(all_dns, isdomain)
     file_db(all_dns, isdomain)
     file_option(all_dns, isdomain)
 
@@ -416,20 +425,20 @@ def main():
     '''launch the domain script if option -domain,
        launch the dns script if no option
        and handle any error that happen during the program'''
-    try:
-        launch_dns_script(init_args_parser(sys.argv[1:]))
-    except OSError as err:
-            print("OS error: {0}".format(err))
-    except NameError as err:
-        print(err)
-    except ValueError as err:
-        print(err)
-    except TypeError as err:
-        print(err)
-    except AttributeError as err:
-        print(err)
-    except:
-        print('Goodbye, world! ', sys.exc_info()[0])
+#    try:
+    launch_dns_script(init_args_parser(sys.argv[1:]))
+#    except OSError as err:
+#            print("OS error: {0}".format(err))
+#    except NameError as err:
+#        print(err)
+#    except ValueError as err:
+#        print(err)
+#    except TypeError as err:
+#        print(err)
+#    except AttributeError as err:
+#        print(err)
+#    except:
+#        print('Goodbye, world! ', sys.exc_info()[0])
 
 if __name__ == '__main__':
     status = main()

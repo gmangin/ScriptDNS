@@ -1,0 +1,22 @@
+; BIND reverse data file for local loopback interface
+;
+$TTL	3600
+@	IN	SOA	test1.tk. root.test1.tk. (
+			      1 	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 86400 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.test1.tk.
+@	IN	NS	ns2.test1.tk.
+@	IN	NS	ns3.test1.tk.
+@	IN	NS	ns4.test1.tk.
+@	IN	A	8.8.8.8
+ns1	IN	A	8.8.8.8
+ns2	IN	A	8.8.8.1
+ns3	IN	A	8.8.8.2
+ns4	IN	A	8.8.8.3
+
+;Hostname entries
+unicorn	IN	A	8.8.8.4
